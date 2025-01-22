@@ -26,17 +26,6 @@ current_test_case_id: Optional[str] = None
 
 
 def trace_lines(frame: FrameType, event: str, arg: object) -> Optional[TraceFunctionType]:
-    """
-    Trace function to capture executed lines in tests and store them in a data structure.
-
-    Args:
-        frame (FrameType): The current stack frame.
-        event (str): The event type (e.g., 'call', 'line').
-        arg (object): Additional arguments for the event (not used here).
-
-    Returns:
-        Optional[TraceFunctionType]: The trace function itself to continue tracing or None.
-    """
     global execution_id, current_test_case_id
 
     if event == "line" and execution_id and current_test_case_id:
@@ -59,7 +48,9 @@ def trace_lines(frame: FrameType, event: str, arg: object) -> Optional[TraceFunc
             # Append the line to the test case traces
             execution_traces[execution_id][current_test_case_id].append(
                 {
-                    "line_number": len(execution_traces[execution_id][current_test_case_id]) + 1,  # Enumerate lines
+                    "line_number": str(
+                        len(execution_traces[execution_id][current_test_case_id]) + 1
+                    ),  # Convert to string
                     "filename": simple_filename,
                     "code": line,
                 }
