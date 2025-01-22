@@ -1,9 +1,12 @@
 from typing import List, Optional
+
 import redis
 
 
 class RedisClient:
-    def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0, password: Optional[str] = "redis_password"):
+    def __init__(
+        self, host: str = "localhost", port: int = 6379, db: int = 0, password: Optional[str] = "redis_password"
+    ):
         self.host = host
         self.port = port
         self.db = db
@@ -22,7 +25,9 @@ class RedisClient:
             raise RuntimeError("Failed to create a Redis connection.")
         return self
 
-    def __exit__(self, exc_type: Optional[type], exc_value: Optional[BaseException], traceback: Optional[BaseException]) -> None:
+    def __exit__(
+        self, exc_type: Optional[type], exc_value: Optional[BaseException], traceback: Optional[BaseException]
+    ) -> None:
         if self.connection:
             self.connection.close()  # type: ignore[no-untyped-call]
         self.connection = None
