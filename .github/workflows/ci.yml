@@ -40,24 +40,24 @@ jobs:
 
       - name: Run Black
         if: always()
-        uses: ./.github/actions/black@main
+        uses: sidkos/pytest_hooks/.github/actions/black@main
 
       - name: Run Isort
         if: always()
-        uses: ./.github/actions/isort@main
+        uses: sidkos/pytest_hooks/.github/actions/isort@main
 
       - name: Run Pycodestyle
         if: always()
-        uses: ./.github/actions/pycodestyle@main
+        uses: sidkos/pytest_hooks/.github/actions/pycodestyle@main
 
       - name: Run Flake8
         if: always()
-        uses: ./.github/actions/flake8@main
+        uses: sidkos/pytest_hooks/.github/actions/flake8@main
 
       - name: Run MyPy
         if: always()
-        uses: ./.github/actions/mypy@main
+        uses: sidkos/pytest_hooks/.github/actions/mypy@main
 
       - name: Run Yaml Lint
         if: always()
-        uses: ./.github/actions/yamllint@main
+        uses: sidkos/pytest_hooks/.github/actions/yamllint@main
