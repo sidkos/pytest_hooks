@@ -24,3 +24,7 @@ runs:
         path: ${{ env.pythonLocation }}
         key: ${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}-${{ github.ref }}
         save-always: true
+
+    - name: Install Python dependencies
+      run: python3 -m pip install -r requirements.txt
+      shell: bash
