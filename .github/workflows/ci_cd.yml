@@ -23,5 +23,5 @@ jobs:
   run-tests:
     name: "🔍 Run tests"
     needs: ci
-    uses: sidkos/pytest_hooks/.github/workflows/run_tests.yml@main
+    uses: sidkos/pytest_hooks/.github/workflows/tests.yml@main
     secrets: inherit
