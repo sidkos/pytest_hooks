@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   ci:
-    name: 🧪 CI
+    name: 🛠️ CI
     uses: sidkos/pytest_hooks/.github/workflows/ci.yml@main
     secrets: inherit
 
