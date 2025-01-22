@@ -23,15 +23,5 @@ jobs:
   run-tests:
     name: "🔍 Run tests"
     needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Run tests
-        run: |
-          echo "Running tests"
-          pytest
-      - name: Upload test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
+    uses: sidkos/pytest_hooks/.github/workflows/run_tests.yml@main
+    secrets: inherit
