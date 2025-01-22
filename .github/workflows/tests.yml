@@ -18,15 +18,12 @@ jobs:
         shell: bash
     services:
       redis:
-        image: redis:latest
+        image: redis
         ports:
           - 6379:6379
-        options: >-
-          --health-cmd "redis-cli -a redis_password ping || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
-          --entrypoint "redis-server --requirepass redis_password"
+        credentials:
+          username: "redis_user"
+          password: "redis_password"
     steps:
       - name: Check Out Code
         uses: actions/checkout@v3
