@@ -6,9 +6,9 @@ services:
     container_name: redis_local
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ["redis-server", "--requirepass", "redis_password"]
+    environment:
+      REDIS_USERNAME: "redis_user"
     restart: always
 
 volumes:

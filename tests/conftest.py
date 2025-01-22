@@ -9,6 +9,7 @@ from _pytest.main import Session
 from _pytest.nodes import Item
 
 from src.clients.petstore_client.petstore_client import PetStoreClient
+from src.clients.redis_client.redis_client import RedisClient
 from src.helpers.tool_box import random_id, random_string
 from src.models.category import Category
 from src.models.pet import Pet
@@ -17,15 +18,12 @@ from src.models.tag import Tag
 # Define the type for the trace function
 TraceFunctionType = Callable[[FrameType, str, object], Optional["TraceFunctionType"]]
 
-# Data structure to store the trace logs for each execution ID
-execution_traces: Dict[str, Dict[str, List[Dict[str, str]]]] = {}
-
-# Global variable to store the current execution ID
+# Global variables for Redis and execution tracking
 execution_id: Optional[str] = None
 current_test_case_id: Optional[str] = None
 
 
-def trace_lines(frame: FrameType, event: str, arg: object) -> Optional[TraceFunctionType]:
+def trace_lines(redis_client: RedisClient, frame: FrameType, event: str, arg: object) -> Optional[TraceFunctionType]:
     global execution_id, current_test_case_id
 
     if event == "line" and execution_id and current_test_case_id:
@@ -34,84 +32,84 @@ def trace_lines(frame: FrameType, event: str, arg: object) -> Optional[TraceFunc
         filename = code.co_filename
         function_name = code.co_name
 
-        # Filter to trace only lines within the current test function
         if function_name.startswith("test_"):
             line = linecache.getline(filename, lineno).strip()
-
-            # Simplify the filename (remove full path)
             simple_filename = filename.split("/")[-1]
 
-            # Initialize the test case trace logs
-            if current_test_case_id not in execution_traces[execution_id]:
-                execution_traces[execution_id][current_test_case_id] = []
+            key = f"{execution_id}:{current_test_case_id}"
+            step_number = int(redis_client.get(f"{key}:step_number") or "0") + 1
+            redis_client.post(f"{key}:step_number", str(step_number))
+            redis_client.post(f"{key}:{step_number}", f"{simple_filename}:{line}")
 
-            # Append the line to the test case traces
-            execution_traces[execution_id][current_test_case_id].append(
-                {
-                    "line_number": str(
-                        len(execution_traces[execution_id][current_test_case_id]) + 1
-                    ),  # Convert to string
-                    "filename": simple_filename,
-                    "code": line,
-                }
-            )
-
-    return trace_lines
+    return lambda f, e, a: trace_lines(redis_client, f, e, a)
 
 
 def pytest_runtest_call(item: Item) -> None:
-    """
-    Hook called before running a test.
-
-    Args:
-        item (Item): The pytest test item object.
-    """
     global current_test_case_id
 
     # Determine the test case ID
-    current_test_case_id = item.name  # Use the test function name with parameters for uniqueness
+    current_test_case_id = item.name
     print(f"\n[pytest] Starting test case: {current_test_case_id}")
-    sys.settrace(trace_lines)
+
+    # Use RedisClient and keep it active for the test's duration
+    redis_client = RedisClient()
+    redis_client.__enter__()
+    sys.settrace(lambda f, e, a: trace_lines(redis_client, f, e, a))
+
+    # Store the Redis client for teardown
+    setattr(item, "_redis_client", redis_client)  # Dynamically add _redis_client
 
 
 def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
-    """
-    Hook called after finishing a test.
-
-    Args:
-        item (Item): The pytest test item object.
-        nextitem (Optional[Item]): The next test item object or None if it's the last test.
-    """
     sys.settrace(None)
     print(f"[pytest] Finished test case: {item.name}")
 
+    # Close Redis connection after the test
+    redis_client = getattr(item, "_redis_client", None)
+    if redis_client:
+        redis_client.__exit__(None, None, None)  # Explicitly close the RedisClient
+
 
 def pytest_sessionstart(session: Session) -> None:
-    """
-    Hook to generate a unique execution ID for the pytest session.
-
-    Args:
-        session (Session): The pytest session object.
-    """
     global execution_id
     execution_id = str(uuid.uuid4())
-    setattr(session.config, "execution_id", execution_id)
     print(f"\n[pytest] Session execution UUID: {execution_id}")
-    execution_traces[execution_id] = {}
 
 
 def pytest_sessionfinish(session: Session, exitstatus: int) -> None:
-    """
-    Hook called after the entire test session ends.
-
-    Args:
-        session (Session): The pytest session object.
-        exitstatus (int): The exit status of the test session.
-    """
     global execution_id
+
     print(f"\n[pytest] Finished session with execution ID: {execution_id}")
-    print(f"\n[pytest] Final Trace Data for Execution ID {execution_id}:")
-    print(execution_traces)
+    print("\n[pytest] Final Report:")
+
+    with RedisClient() as redis_client:
+        keys = redis_client.keys(f"{execution_id}:*")
+        test_steps: Dict[str, List[str]] = {}  # Explicit type annotation
+
+        # Group steps by test name
+        for key in keys:
+            if key.endswith(":step_number"):
+                continue  # Skip step number keys
+
+            # Extract test name from key
+            parts = key.split(":")
+            if len(parts) < 3:
+                continue  # Skip invalid keys
+            test_name = parts[1]
+
+            if test_name not in test_steps:
+                test_steps[test_name] = []
+
+            # Add step content to test_steps
+            step_content = redis_client.get(key)
+            if step_content:
+                test_steps[test_name].append(step_content)
+
+        # Print the grouped steps in a structured format
+        for test_name, steps in test_steps.items():
+            print(f"\n{test_name}:")
+            for idx, step in enumerate(steps, start=1):
+                print(f"  Step {idx}: {step}")
 
 
 @pytest.fixture(scope="function", name="random_pet")

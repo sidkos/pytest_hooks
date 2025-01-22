@@ -1,43 +1,60 @@
-from typing import Optional
-
+from typing import List, Optional
 import redis
 
 
 class RedisClient:
-    def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0):
+    def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0, password: Optional[str] = "redis_password"):
         self.host = host
         self.port = port
         self.db = db
+        self.password = password
         self.connection: Optional[redis.Redis] = None
 
     def __enter__(self) -> "RedisClient":
-        self.connection = redis.StrictRedis(host=self.host, port=self.port, db=self.db, decode_responses=True)
-        if self.connection is None:
+        self.connection = redis.StrictRedis(
+            host=self.host,
+            port=self.port,
+            db=self.db,
+            password=self.password,  # Pass the password for authentication
+            decode_responses=True,
+        )
+        if not self.connection:
             raise RuntimeError("Failed to create a Redis connection.")
-        self.connection.ping()  # Check if the Redis server is available
-        print(f"Connected to Redis at {self.host}:{self.port}")
         return self
 
-    def __exit__(
-        self, exc_type: Optional[type], exc_value: Optional[BaseException], traceback: Optional[BaseException]
-    ) -> None:
+    def __exit__(self, exc_type: Optional[type], exc_value: Optional[BaseException], traceback: Optional[BaseException]) -> None:
         if self.connection:
-            print("Closing Redis connection.")
-            self.connection.close()  # type: ignore[no-untyped-call]  # Suppress mypy error
-        self.connection = None  # Reset the connection
+            self.connection.close()  # type: ignore[no-untyped-call]
+        self.connection = None
 
     def post(self, key: str, value: str) -> bool:
         if not self.connection:
             raise RuntimeError("Redis connection is not established.")
-        result = self.connection.set(key, value)
-        return bool(result)
+        return bool(self.connection.set(key, value))
 
     def get(self, key: str) -> Optional[str]:
         if not self.connection:
             raise RuntimeError("Redis connection is not established.")
         result = self.connection.get(key)
-        if result is None:
-            return None
-        if not isinstance(result, str):  # Ensure type safety
-            raise TypeError(f"Expected str from Redis, got {type(result).__name__}.")
-        return result
+        return str(result) if result is not None else None
+
+    def keys(self, pattern: str) -> List[str]:
+        if not self.connection:
+            raise RuntimeError("Redis connection is not established.")
+        result = self.connection.keys(pattern)
+        return list(result) if isinstance(result, list) else []
+
+    def delete(self, key: str) -> bool:
+        if not self.connection:
+            raise RuntimeError("Redis connection is not established.")
+        return bool(self.connection.delete(key))
+
+    def exists(self, key: str) -> bool:
+        if not self.connection:
+            raise RuntimeError("Redis connection is not established.")
+        return bool(self.connection.exists(key))
+
+    def flushdb(self) -> None:
+        if not self.connection:
+            raise RuntimeError("Redis connection is not established.")
+        self.connection.flushdb()

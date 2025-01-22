@@ -16,9 +16,26 @@ jobs:
     defaults:
       run:
         shell: bash
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --requirepass redis_password
     steps:
-      - name: SetUp Python Project
-        uses: sidkos/pytest_hooks/.github/actions/setup_python_project@main
+      - name: Check Out Code
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
       - name: Run Pytest
+        env:
+          REDIS_PASSWORD: redis_password
         run: pytest .
