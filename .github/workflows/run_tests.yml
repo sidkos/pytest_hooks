@@ -1,0 +1,16 @@
+---
+name: Run Tests
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  run-tests:
+      needs: ci
+      uses: ./.github/workflows/run_tests.yml
+      secrets: inherit

@@ -1,0 +1,63 @@
+---
+name: 🛠️ CI
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  static-code-analysis-workflow:
+    name: "🔍 📄 Static Code Analysis"
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Upgrade pip
+        run: python3 -m pip install --upgrade pip
+        shell: bash
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        id: cache-python-dependencies
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}-${{ github.ref }}
+          save-always: true
+
+
+      - name: Run Black
+        if: always()
+        uses: ./.github/actions/black@main
+
+      - name: Run Isort
+        if: always()
+        uses: ./.github/actions/isort@main
+
+      - name: Run Pycodestyle
+        if: always()
+        uses: ./.github/actions/pycodestyle@main
+
+      - name: Run Flake8
+        if: always()
+        uses: ./.github/actions/flake8@main
+
+      - name: Run MyPy
+        if: always()
+        uses: ./.github/actions/mypy@main
+
+      - name: Run Yaml Lint
+        if: always()
+        uses: ./.github/actions/yamllint@main

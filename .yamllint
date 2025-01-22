@@ -1,0 +1,14 @@
+extends: default
+
+rules:
+  line-length:
+    max: 170
+    level: warning
+  indentation:
+    spaces: 2
+  truthy:
+    level: warning
+  trailing-spaces:
+    level: error
+  document-start:
+    present: true
