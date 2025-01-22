@@ -22,7 +22,11 @@ jobs:
         ports:
           - 6379:6379
         options: >-
-          --requirepass redis_password
+          --health-cmd "redis-cli -a redis_password ping || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+        command: ["redis-server", "--requirepass", "redis_password"]
     steps:
       - name: Check Out Code
         uses: actions/checkout@v3
