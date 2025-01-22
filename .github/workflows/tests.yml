@@ -1,0 +1,24 @@
+---
+name: "🔍 TESTS"
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  run-tests:
+    name: "🔍 Tests"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: SetUp Python Project
+        uses: sidkos/pytest_hooks/.github/actions/setup_python_project@main
+
+      - name: Run Pytest
+        run: pytest .
