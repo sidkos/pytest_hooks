@@ -15,13 +15,13 @@ permissions:
   packages: write
 
 jobs:
-#  ci:
-#    name: 🛠️ CI
-#    uses: sidkos/pytest_hooks/.github/workflows/ci.yml@main
-#    secrets: inherit
+  ci:
+    name: 🛠️ CI
+    uses: sidkos/pytest_hooks/.github/workflows/ci.yml@main
+    secrets: inherit
 
   run-tests:
     name: "🔍 Run tests"
-#    needs: ci
+    needs: ci
     uses: sidkos/pytest_hooks/.github/workflows/tests.yml@main
     secrets: inherit

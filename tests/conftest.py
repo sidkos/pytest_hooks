@@ -11,7 +11,7 @@ from _pytest.nodes import Item
 
 from src.clients.petstore_client.petstore_client import PetStoreClient
 from src.clients.redis_client.redis_client import RedisClient
-from src.helpers.tool_box import print_report, random_id, random_string
+from src.helpers.tool_box import random_id, random_string
 from src.models.category import Category
 from src.models.pet import Pet
 from src.models.tag import Tag
@@ -88,8 +88,6 @@ def pytest_sessionfinish(session: Session, exitstatus: int) -> None:
 
     print(f"\n[pytest] Finished session with execution ID: {execution_id}")
     print("\n[pytest] Final Report:")
-
-    print_report()
 
 
 @pytest.fixture(scope="function", name="random_pet")
