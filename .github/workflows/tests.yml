@@ -15,26 +15,19 @@ jobs:
     defaults:
       run:
         shell: bash
-    services:
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
-      - name: Check Out Code
-        uses: actions/checkout@v3
+      - name: SetUp Python Project
+        uses: sidkos/pytest_hooks/.github/actions/setup_python_project@main
 
-      - name: Set Up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
+      - name: Run Docker Compose
+        run: docker-compose up -d
+        shell: bash
 
       - name: Run Pytest
         run: pytest .
+
+      - name: Stop Docker Compose
+        run: docker-compose down
+        shell: bash
+
 
