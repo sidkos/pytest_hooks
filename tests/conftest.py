@@ -1,8 +1,9 @@
 import linecache
+import os
 import sys
 import uuid
 from types import FrameType
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Optional
 
 import pytest
 from _pytest.main import Session
@@ -10,7 +11,7 @@ from _pytest.nodes import Item
 
 from src.clients.petstore_client.petstore_client import PetStoreClient
 from src.clients.redis_client.redis_client import RedisClient
-from src.helpers.tool_box import random_id, random_string
+from src.helpers.tool_box import print_report, random_id, random_string
 from src.models.category import Category
 from src.models.pet import Pet
 from src.models.tag import Tag
@@ -73,6 +74,8 @@ def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
 def pytest_sessionstart(session: Session) -> None:
     global execution_id
     execution_id = str(uuid.uuid4())
+    # Set the execution_id as env variable for the test cases
+    os.environ["EXECUTION_ID"] = execution_id
     print(f"\n[pytest] Session execution UUID: {execution_id}")
 
 
@@ -82,34 +85,7 @@ def pytest_sessionfinish(session: Session, exitstatus: int) -> None:
     print(f"\n[pytest] Finished session with execution ID: {execution_id}")
     print("\n[pytest] Final Report:")
 
-    with RedisClient() as redis_client:
-        keys = redis_client.keys(f"{execution_id}:*")
-        test_steps: Dict[str, List[str]] = {}  # Explicit type annotation
-
-        # Group steps by test name
-        for key in keys:
-            if key.endswith(":step_number"):
-                continue  # Skip step number keys
-
-            # Extract test name from key
-            parts = key.split(":")
-            if len(parts) < 3:
-                continue  # Skip invalid keys
-            test_name = parts[1]
-
-            if test_name not in test_steps:
-                test_steps[test_name] = []
-
-            # Add step content to test_steps
-            step_content = redis_client.get(key)
-            if step_content:
-                test_steps[test_name].append(step_content)
-
-        # Print the grouped steps in a structured format
-        for test_name, steps in test_steps.items():
-            print(f"\n{test_name}:")
-            for idx, step in enumerate(steps, start=1):
-                print(f"  Step {idx}: {step}")
+    print_report()
 
 
 @pytest.fixture(scope="function", name="random_pet")

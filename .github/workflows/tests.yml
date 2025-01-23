@@ -24,7 +24,12 @@ jobs:
         shell: bash
 
       - name: Run Pytest
-        run: pytest .
+        run: |
+          pytest .
+          echo "EXECUTION_ID=$EXECUTION_ID" >> $GITHUB_ENV
+
+      - name: Print Report
+        run: python3 report.py
 
       - name: Stop Docker Compose
         run: docker compose -f docker-compose.yml down
