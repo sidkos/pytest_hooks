@@ -25,10 +25,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 3
-        env:
-          REDIS_PASSWORD: redis_password
-        command: ["redis-server", "--requirepass", "redis_password"]
-
+          --requirepass redis_password
     steps:
       - name: Check Out Code
         uses: actions/checkout@v3
