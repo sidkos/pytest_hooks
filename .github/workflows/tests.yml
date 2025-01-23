@@ -1,4 +1,3 @@
----
 name: "🔍 TESTS"
 
 on:
@@ -18,12 +17,18 @@ jobs:
         shell: bash
     services:
       redis:
-        image: redis
+        image: redis:latest
         ports:
           - 6379:6379
-        credentials:
-          username: "redis_user"
-          password: "redis_password"
+        options: >-
+          --health-cmd "redis-cli -a redis_password ping || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+        env:
+          REDIS_PASSWORD: redis_password
+        command: ["redis-server", "--requirepass", "redis_password"]
+
     steps:
       - name: Check Out Code
         uses: actions/checkout@v3
