@@ -6,7 +6,7 @@ services:
     container_name: redis_local
     ports:
       - "6379:6379"
-    command: ["redis-server", "--requirepass", "redis_password"]
+    command: ["redis-server"]
     environment:
       REDIS_USERNAME: "redis_user"
     restart: always

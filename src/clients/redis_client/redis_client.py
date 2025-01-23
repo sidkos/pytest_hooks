@@ -4,13 +4,10 @@ import redis
 
 
 class RedisClient:
-    def __init__(
-        self, host: str = "localhost", port: int = 6379, db: int = 0, password: Optional[str] = "redis_password"
-    ):
+    def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0):
         self.host = host
         self.port = port
         self.db = db
-        self.password = password
         self.connection: Optional[redis.Redis] = None
 
     def __enter__(self) -> "RedisClient":
@@ -18,7 +15,6 @@ class RedisClient:
             host=self.host,
             port=self.port,
             db=self.db,
-            password=self.password,  # Pass the password for authentication
             decode_responses=True,
         )
         if not self.connection:
