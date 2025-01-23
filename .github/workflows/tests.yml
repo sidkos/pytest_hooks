@@ -28,6 +28,9 @@ jobs:
           pytest .
           echo "EXECUTION_ID=$EXECUTION_ID" >> $GITHUB_ENV
 
+      - name: Check EXECUTION_ID is set
+        run: echo "EXECUTION_ID is $EXECUTION_ID"
+
       - name: Print Report
         run: python3 print_report.py
 
