@@ -29,7 +29,7 @@ jobs:
           echo "EXECUTION_ID=$EXECUTION_ID" >> $GITHUB_ENV
 
       - name: Print Report
-        run: python3 src/helpers/tool_box.py
+        run: python3 print_report.py
 
       - name: Stop Docker Compose
         run: docker compose -f docker-compose.yml down

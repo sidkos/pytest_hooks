@@ -46,7 +46,3 @@ def print_report() -> None:
             print(f"\n{test_name}:")
             for idx, step in enumerate(steps, start=1):
                 print(f"  Step {idx}: {step}")
-
-
-if __name__ == "__main__":
-    print_report()
