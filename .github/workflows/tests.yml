@@ -20,14 +20,13 @@ jobs:
         uses: sidkos/pytest_hooks/.github/actions/setup_python_project@main
 
       - name: Run Docker Compose
-        run: docker-compose up -d
+        run: docker compose -f docker-compose.yml up -d
         shell: bash
 
       - name: Run Pytest
         run: pytest .
 
       - name: Stop Docker Compose
-        run: docker-compose down
-        shell: bash
+        run: docker compose -f docker-compose.yml down
 
 
