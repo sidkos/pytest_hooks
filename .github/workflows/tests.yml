@@ -24,14 +24,10 @@ jobs:
         shell: bash
 
       - name: Run Pytest
-        run: |
-          pytest .
-          echo ""
-          echo ""
-          echo "EXECUTION_ID is $EXECUTION_ID"
-          echo ""
-          echo ""
-          echo "EXECUTION_ID=$EXECUTION_ID" >> $GITHUB_ENV
+        run: pytest .
+
+      - name: Set EXECUTION_ID from execution_id.txt
+        run: echo "EXECUTION_ID=$(cat execution_id.txt)" >> $GITHUB_ENV
 
       - name: Check EXECUTION_ID is set
         run: echo "EXECUTION_ID is $EXECUTION_ID"

@@ -74,8 +74,12 @@ def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
 def pytest_sessionstart(session: Session) -> None:
     global execution_id
     execution_id = str(uuid.uuid4())
-    # Set the execution_id as env variable for the test cases
-    os.environ["EXECUTION_ID"] = execution_id
+    os.environ["EXECUTION_ID"] = execution_id  # Set for the current process
+
+    # Save the execution ID to a file for use in subsequent steps
+    with open("execution_id.txt", "w") as f:
+        f.write(execution_id)
+
     print(f"\n[pytest] Session execution UUID: {execution_id}")
 
 
