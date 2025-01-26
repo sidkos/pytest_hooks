@@ -20,7 +20,7 @@ def print_report() -> None:
 
     with RedisClient() as redis_client:
         keys = redis_client.keys(f"{execution_id}:*")
-        test_steps: Dict[str, List[str]] = {}  # Explicit type annotation
+        test_steps: Dict[str, List[str]] = {}
 
         # Group steps by test name
         for key in keys:

@@ -21,7 +21,6 @@ class Pet(BaseModel):
         self._tags = tags or []
         self._status = status
 
-    # Getters and Setters for Category
     @property
     def category(self) -> Optional[Category]:
         return self._category
@@ -30,7 +29,6 @@ class Pet(BaseModel):
     def category(self, value: Optional[Category]) -> None:
         self._category = value
 
-    # Getters and Setters for Photo URLs
     @property
     def photo_urls(self) -> List[str]:
         return self._photo_urls
@@ -39,7 +37,6 @@ class Pet(BaseModel):
     def photo_urls(self, value: List[str]) -> None:
         self._photo_urls = value
 
-    # Getters and Setters for Tags
     @property
     def tags(self) -> List[Tag]:
         return self._tags
@@ -48,7 +45,6 @@ class Pet(BaseModel):
     def tags(self, value: List[Tag]) -> None:
         self._tags = value
 
-    # Getters and Setters for Status
     @property
     def status(self) -> Optional[str]:
         return self._status

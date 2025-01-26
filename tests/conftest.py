@@ -58,7 +58,7 @@ def pytest_runtest_call(item: Item) -> None:
     sys.settrace(lambda f, e, a: trace_lines(redis_client, f, e, a))
 
     # Store the Redis client for teardown
-    setattr(item, "_redis_client", redis_client)  # Dynamically add _redis_client
+    setattr(item, "_redis_client", redis_client)
 
 
 def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
@@ -68,19 +68,19 @@ def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
     # Close Redis connection after the test
     redis_client = getattr(item, "_redis_client", None)
     if redis_client:
-        redis_client.__exit__(None, None, None)  # Explicitly close the RedisClient
+        redis_client.__exit__(None, None, None)
 
 
 def pytest_sessionstart(session: Session) -> None:
     global execution_id
     execution_id = str(uuid.uuid4())
-    os.environ["EXECUTION_ID"] = execution_id  # Set for the current process
+    os.environ["EXECUTION_ID"] = execution_id
 
     # Save the execution ID to a file for use in subsequent steps
     with open("execution_id.txt", "w") as f:
         f.write(execution_id)
 
-    print(f"\n[pytest] Session execution UUID: {execution_id}")
+    print(f"\n[pytest] Session execution ID: {execution_id}")
 
 
 def pytest_sessionfinish(session: Session, exitstatus: int) -> None:
