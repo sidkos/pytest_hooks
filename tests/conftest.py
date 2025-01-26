@@ -1,4 +1,5 @@
 import linecache
+import logging
 import os
 import sys
 import uuid
@@ -69,6 +70,15 @@ def pytest_runtest_teardown(item: Item, nextitem: Optional[Item]) -> None:
     redis_client = getattr(item, "_redis_client", None)
     if redis_client:
         redis_client.__exit__(None, None, None)
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_setup(item: pytest.Item) -> None:
+    """Logging the test name and its parameters if any."""
+    params = item.callspec.params if hasattr(item, "callspec") else {}
+    test_name = item.name
+    logging.debug("*********************** Starting new test ***********************")
+    logging.debug(f"Starting test: {test_name} with parameters {params}")
 
 
 def pytest_sessionstart(session: Session) -> None:
