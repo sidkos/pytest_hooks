@@ -1,29 +1,10 @@
 from typing import Any, Optional, cast
 
-import requests
-
+from src.clients.petstore_client.api.base_api import BaseAPI
 from src.models.pet import Pet
 
 
-class PetAPI:
-    def __init__(self, base_url: str, headers: dict[str, str]) -> None:
-        self.base_url = base_url
-        self.headers = headers
-
-    def _request(
-        self,
-        method: str,
-        endpoint: str,
-        *,
-        params: Optional[dict[str, Any]] = None,
-        json: Optional[dict[str, Any]] = None,
-        files: Optional[dict[str, Any]] = None,
-    ) -> Any:
-        url = f"{self.base_url}{endpoint}"
-        response = requests.request(method, url, headers=self.headers, params=params, json=json, files=files)
-        response.raise_for_status()
-        return response.json() if response.content else None
-
+class PetAPI(BaseAPI):
     def get_pet_by_id(self, pet_id: int) -> Pet:
         data = self._request("GET", f"/pet/{pet_id}")
         return Pet.from_dict(data)
