@@ -14,7 +14,7 @@ from src.models.tag import Tag
 @pytest.mark.parametrize(
     "attribute, updated_value",
     [
-        ("name", random_string()),
+        pytest.param("name", random_string(), marks=pytest.mark.sanity),
         ("category", Category(id=random_id(), name=random_string())),
         ("photo_urls", [f"https://example.com/{random_string()}.jpg"]),
         ("tags", [Tag(id=random_id(), name=random_string())]),
