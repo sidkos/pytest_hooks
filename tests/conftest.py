@@ -43,7 +43,7 @@ def trace_lines(redis_client: RedisClient, frame: FrameType, event: str, arg: ob
             redis_client.post(f"{key}:step_number", str(step_number))
             redis_client.post(f"{key}:{step_number}", f"{simple_filename}:{line}")
 
-    return lambda f, e, a: trace_lines(redis_client, f, e, a)
+    return lambda f, e, a: trace_lines(redis_client, f, e, a)  # f - frame, e - event, a - argument
 
 
 def pytest_runtest_call(item: Item) -> None:
@@ -56,7 +56,7 @@ def pytest_runtest_call(item: Item) -> None:
     # Use RedisClient and keep it active for the test's duration
     redis_client = RedisClient()
     redis_client.__enter__()
-    sys.settrace(lambda f, e, a: trace_lines(redis_client, f, e, a))
+    sys.settrace(lambda f, e, a: trace_lines(redis_client, f, e, a))  # f - frame, e - event, a - argument
 
     # Store the Redis client for teardown
     setattr(item, "_redis_client", redis_client)
