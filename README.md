@@ -148,12 +148,6 @@ This project includes CI/CD workflows to automate code quality checks, testing, 
    - Uses Docker Compose to set up any required dependencies (e.g., Redis).
    - Logs the execution results and generates reports for debugging.
 
-4. **Continuous Deployment (CD)**:
-   - Integrates seamlessly into the CI pipeline.
-   - Deploys the code automatically to the designated environment once tests and quality checks pass.
-
-These workflows ensure a smooth and automated development lifecycle, reducing manual intervention and enhancing code reliability.
-
 ---
 
 ## **How It Works**
