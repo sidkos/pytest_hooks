@@ -97,8 +97,6 @@ def pytest_sessionfinish(session: Session, exitstatus: int) -> None:
     global execution_id
 
     print(f"\n[pytest] Finished session with execution ID: {execution_id}")
-    print("\n[pytest] Final Report:")
-
 
 @pytest.fixture(scope="function", name="random_pet")
 def generate_pet(random_tag: Tag, random_category: Category, status: str = "available") -> Pet:
